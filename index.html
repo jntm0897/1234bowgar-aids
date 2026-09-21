@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d12">
+<title>猎鬼手册 V2</title>
+<style>
+  :root{
+    --bg:#0b0d12; --card:#141821; --card2:#1a1f2b; --line:#232a38;
+    --text:#e8e6e3; --muted:#9aa3b2; --dim:#5c6575;
+    --orange:#ff7a1a; --red:#e5484d; --green:#3fb950; --gold:#d4a017;
+    --emf:#b5d43c; --uv:#a78bfa; --note:#5c9ded; --board:#d4699b; --frog:#4ade80; --balloon:#f472b6; --cold:#67e8f9;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC","Source Han Sans SC",sans-serif;
+    line-height:1.75; font-size:16px;
+    background-image:radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,122,26,.06), transparent);
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:0 16px 60px}
+
+  /* ===== 头部 ===== */
+  header{padding:44px 0 18px;text-align:center}
+  .logo{font-size:34px;font-weight:800;letter-spacing:6px;color:var(--orange);
+    text-shadow:0 0 22px rgba(255,122,26,.35); animation:flick 4.5s infinite}
+  @keyframes flick{0%,100%{opacity:1}92%{opacity:1}93%{opacity:.55}94%{opacity:1}96%{opacity:.7}97%{opacity:1}}
+  .sub{color:var(--muted);font-size:13px;letter-spacing:3px;margin-top:6px}
+  .tagline{margin-top:14px;color:var(--dim);font-size:13px;font-style:italic}
+
+  /* ===== 导航 ===== */
+  nav{position:sticky;top:0;z-index:50;background:rgba(11,13,18,.92);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);margin:0 -16px;padding:0 16px}
+  .nav-row{display:flex;gap:8px;overflow-x:auto;padding:10px 0;scrollbar-width:none}
+  .nav-row::-webkit-scrollbar{display:none}
+  .nav-row a{flex:0 0 auto;color:var(--muted);text-decoration:none;font-size:13px;
+    padding:5px 13px;border:1px solid var(--line);border-radius:999px;background:var(--card)}
+  .nav-row a:active{color:var(--orange);border-color:var(--orange)}
+
+  /* ===== 通用 ===== */
+  section{padding-top:34px}
+  h2{font-size:21px;color:var(--orange);letter-spacing:2px;margin-bottom:14px;
+    display:flex;align-items:center;gap:10px}
+  h2::before{content:"";width:5px;height:20px;background:var(--orange);border-radius:2px;
+    box-shadow:0 0 10px rgba(255,122,26,.6)}
+  h3{font-size:16px;color:var(--gold);margin:16px 0 8px}
+  p{margin-bottom:10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+  .muted{color:var(--muted)} .small{font-size:13px}
+  strong{color:#fff}
+  em{color:var(--orange);font-style:normal;font-weight:600}
+  .danger{color:var(--red);font-weight:600}
+  .warn{color:var(--gold);font-weight:600}
+
+  /* ===== 流程时间线 ===== */
+  .phase{display:flex;gap:14px;margin-bottom:2px}
+  .p-time{flex:0 0 74px;text-align:right;color:var(--orange);font-weight:700;font-size:14px;padding-top:2px}
+  .p-body{flex:1;border-left:2px solid var(--line);padding:0 0 18px 16px;position:relative}
+  .p-body::before{content:"";position:absolute;left:-6px;top:7px;width:10px;height:10px;
+    border-radius:50%;background:var(--orange);box-shadow:0 0 8px rgba(255,122,26,.7)}
+  .p-name{font-weight:700;font-size:16px;margin-bottom:4px}
+  .p-desc{color:var(--muted);font-size:14px}
+
+  /* ===== 规则双栏 ===== */
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:420px){.duo{grid-template-columns:1fr}}
+  .do{border-color:rgba(63,185,80,.4)} .dont{border-color:rgba(229,72,77,.4)}
+  .do h3{color:var(--green);margin-top:0} .dont h3{color:var(--red);margin-top:0}
+  .duo ul{padding-left:18px;font-size:14px;color:var(--muted)}
+  .duo li{margin-bottom:6px}
+
+  /* ===== 地形 ===== */
+  .terrain{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:420px){.terrain{grid-template-columns:1fr}}
+  .t-item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .t-item b{display:block;font-size:15px}
+  .t-item span{font-size:12.5px;color:var(--muted)}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:8px 0}
+  th{color:var(--gold);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:8px 10px;border-bottom:1px solid rgba(35,42,56,.6);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+
+  /* ===== 证据 ===== */
+  .ev-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media(max-width:420px){.ev-grid{grid-template-columns:1fr}}
+  .ev-item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .ev-item b{display:flex;align-items:center;gap:8px;font-size:15px}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:0 0 9px}
+  .ev-item span{font-size:12.5px;color:var(--muted);display:block;margin-top:2px}
+
+  /* ===== 档案筛选 ===== */
+  .filter-box{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px;position:sticky;top:53px;z-index:40}
+  .fb-title{font-size:13px;color:var(--muted);margin-bottom:10px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1.5px solid var(--line);background:var(--card);color:var(--muted);
+    padding:7px 14px;border-radius:999px;font-size:14px;cursor:pointer;user-select:none;transition:all .15s}
+  .chip.active{color:#0b0d12;font-weight:700;border-color:transparent}
+  .chip.active[data-ev=emf]{background:var(--emf)}
+  .chip.active[data-ev=uv]{background:var(--uv)}
+  .chip.active[data-ev=note]{background:var(--note)}
+  .chip.active[data-ev=board]{background:var(--board)}
+  .chip.active[data-ev=frog]{background:var(--frog)}
+  .chip.active[data-ev=balloon]{background:var(--balloon)}
+  .chip.active[data-ev=cold]{background:var(--cold)}
+  .fb-bar{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+  .fb-count{font-size:13px;color:var(--muted)}
+  .fb-count b{color:var(--orange);font-size:16px}
+  .fb-reset{border:none;background:transparent;color:var(--dim);font-size:13px;cursor:pointer;text-decoration:underline}
+
+  /* ===== 鬼档案卡 ===== */
+  .ghost{border:1px solid var(--line);border-radius:14px;background:var(--card);margin-bottom:10px;overflow:hidden;transition:opacity .2s}
+  .ghost.dimmed{opacity:.22}
+  .ghost summary{list-style:none;display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer}
+  .ghost summary::-webkit-details-marker{display:none}
+  .g-num{font-size:11px;color:var(--dim);font-weight:700;letter-spacing:1px;flex:0 0 auto}
+  .g-name{font-weight:700;font-size:16px;flex:1;min-width:0}
+  .g-name i{font-style:normal;color:var(--dim);font-size:11px;font-weight:400;margin-left:6px}
+  .g-arrow{color:var(--dim);font-size:12px;transition:transform .2s;flex:0 0 auto}
+  .ghost[open] .g-arrow{transform:rotate(90deg)}
+  .g-evline{display:flex;flex-wrap:wrap;gap:5px;padding:0 14px 12px;margin-top:-4px}
+  .eb{font-size:10.5px;padding:2px 8px;border-radius:999px;border:1px solid;letter-spacing:.5px}
+  .eb.emf{color:var(--emf);border-color:var(--emf)} .eb.uv{color:var(--uv);border-color:var(--uv)}
+  .eb.note{color:var(--note);border-color:var(--note)} .eb.board{color:var(--board);border-color:var(--board)}
+  .eb.frog{color:var(--frog);border-color:var(--frog)} .eb.balloon{color:var(--balloon);border-color:var(--balloon)}
+  .eb.cold{color:var(--cold);border-color:var(--cold)}
+  .eb.must{color:#0b0d12;background:var(--balloon);border-color:var(--balloon);font-weight:700}
+  .g-body{padding:4px 16px 15px;border-top:1px dashed var(--line)}
+  .g-body h4{font-size:12px;letter-spacing:2px;margin:12px 0 4px}
+  .g-body h4.sk{color:var(--red)} .g-body h4.ct{color:var(--green)}
+  .g-body p{font-size:14px;color:#cdd3dd;margin-bottom:0}
+  .redacted{background:var(--dim);color:transparent;border-radius:4px;user-select:none}
+
+  /* ===== 安全 ===== */
+  .stop{background:linear-gradient(135deg,rgba(229,72,77,.15),rgba(229,72,77,.05));
+    border:1px solid rgba(229,72,77,.5);border-radius:14px;padding:18px;text-align:center;margin-bottom:12px}
+  .stop b{font-size:30px;color:var(--red);letter-spacing:8px;display:block;text-shadow:0 0 18px rgba(229,72,77,.5)}
+
+  footer{margin-top:44px;text-align:center;color:var(--dim);font-size:12px;font-style:italic;line-height:2}
+
+  .float-btns{position:fixed;right:14px;bottom:18px;display:flex;flex-direction:column;gap:8px;z-index:60}
+  .fbtn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(20,24,33,.95);
+    color:var(--orange);font-size:12px;cursor:pointer;backdrop-filter:blur(6px)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="logo">猎鬼手册</div>
+  <div class="sub">G H O S T &nbsp; M A N U A L &nbsp; V 2</div>
+  <div class="tagline">证据不会说谎，但它会。</div>
+</header>
+
+<nav><div class="nav-row">
+  <a href="#flow">流程</a><a href="#rules">规则</a><a href="#terrain">地形</a>
+  <a href="#basics">识鬼</a><a href="#evidence">证据</a><a href="#archives" style="color:var(--orange);border-color:var(--orange)">鬼魂档案</a>
+  <a href="#safety">安全</a>
+</div></nav>
+
+<!-- ============ 欢迎 ============ -->
+<section>
+  <div class="card">
+    <p>万圣节之夜，教学楼三层的那间教室又亮起了灯。</p>
+    <p><strong>二十四种怨灵</strong>在此徘徊。你们，是今晚最后的驱鬼调查队。</p>
+    <p>你的任务只有两件事：</p>
+    <p><em>一、查出它是谁</em>——用证据说话；<br><em>二、活下来</em>——它查出你们的方式，要直接得多。</p>
+    <p class="small muted">你背上贴着的颜色，就是你的命。鬼魂命中你时会喊出你的颜色——听到自己的颜色，就受了一次伤；<span class="danger">受两次，出局。</span></p>
+  </div>
+</section>
+
+<!-- ============ 流程 ============ -->
+<section id="flow">
+  <h2>游戏流程</h2>
+  <div class="phase"><div class="p-time">1 分钟</div><div class="p-body">
+    <div class="p-name">入场</div><div class="p-desc">领取颜色贴纸，听工作人员讲解规则。</div></div></div>
+  <div class="phase"><div class="p-time">2 分钟</div><div class="p-body">
+    <div class="p-name">调查</div><div class="p-desc">在场内自由取证：放置道具、观察鬼魂、收集证据；可以进出鬼房。<strong>这个阶段鬼魂不会攻击你。</strong></div></div></div>
+  <div class="phase"><div class="p-time">60 秒</div><div class="p-body">
+    <div class="p-name">鉴鬼</div><div class="p-desc">进入绿线安全区提交答案。<strong>可以反复修改，直到口头说出"最终确认"</strong>（确认后不可更改）。答对：全队获知技能简报；答错：同样会展示所选鬼的简报——小心被误导。时间到或确认后，所有人被请出安全区。</div></div></div>
+  <div class="phase"><div class="p-time">3 分钟</div><div class="p-body">
+    <div class="p-name">猎杀</div><div class="p-desc">音乐变了，它来了。<strong>不能返回安全区。</strong>被命中 2 次即淘汰。</div></div></div>
+  <div class="phase"><div class="p-time">结算</div><div class="p-body" style="border-left-color:transparent;padding-bottom:4px">
+    <div class="p-name" style="margin-top:-2px"></div><div class="p-desc">公布鬼魂身份与鉴定结果，清点存活人数。</div></div></div>
+  <div class="card small muted">被淘汰的玩家可留在安全区观战：可以说话，但<strong>不可以影响游戏</strong>（不许挡路、干扰、误导）。</div>
+</section>
+
+<!-- ============ 规则 ============ -->
+<section id="rules">
+  <h2>玩家的规则</h2>
+  <div class="duo">
+    <div class="card do"><h3>你能做</h3><ul>
+      <li>正常速度行走</li><li>翻越红椅窗（约 2 秒）</li><li><strong>放板</strong>——对鬼魂唯一的反制</li><li>翻越放下的板</li><li>取证、观察、推理、呼救</li>
+    </ul></div>
+    <div class="card dont"><h3>你不能做</h3><ul>
+      <li><strong>奔跑</strong>（唯一例外：受实际伤害后可跑 3 秒）</li><li><strong>攻击鬼魂</strong>——鬼无法被伤害，拉扯推搡属严重犯规</li><li>移动白板、桌子等大型地形</li><li>猎杀阶段返回安全区</li><li>干扰工作人员判定</li>
+    </ul></div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">淘汰判定</h3>
+    <p class="small">被命中 <strong>2 次</strong>即淘汰，立即移入安全区观灵席。命中以<strong>鬼魂喊出你的颜色</strong>为准——它没喊，就不算。</p>
+    <p class="small muted">特殊命中口径：巨灵长棍需命中你 3 次、雷魂长棍 2 次；纸团要连续砸中你 3 次才算 1 次伤害。</p>
+  </div>
+</section>
+
+<!-- ============ 地形 ============ -->
+<section id="terrain">
+  <h2>地形指南</h2>
+  <div class="terrain">
+    <div class="t-item"><b>桌子 · 矮墙</b><span>不可跨越；鬼魂可以隔着桌子捅到你</span></div>
+    <div class="t-item"><b>红椅 · 窗</b><span>双方都可翻越，约 2 秒</span></div>
+    <div class="t-item"><b>白椅 · 板</b><span>开局全部收起（不挡路），玩家可以放下它</span></div>
+    <div class="t-item"><b>白板 · 墙</b><span>完全阻挡视线与移动</span></div>
+    <div class="t-item"><b>绿线内 · 鉴鬼区</b><span>仅鉴鬼阶段开放；猎杀阶段封闭</span></div>
+    <div class="t-item"><b>鬼房</b><span>鬼魂开局自选的房间，进入有后果（见御灵档案）</span></div>
+  </div>
+  <div class="card" style="border-color:rgba(255,122,26,.45)">
+    <h3 style="margin-top:0;color:var(--orange)">板——你最重要的武器</h3>
+    <p class="small">把白椅沿折叠面展开放下，就是一块"板"。</p>
+    <p class="small"><strong>放板时，只要鬼魂在板落点 0.5 米内，它就会被砸晕 5 秒</strong>——不需要真的砸中它。（隔着墙或障碍物无效）</p>
+    <p class="small">放下的板<strong>只有玩家能翻越</strong>；鬼魂只能花 5 秒以上把它彻底摧毁（摧毁后本局永久失效）。</p>
+    <p class="small muted">放板不耗时、不限次数、怎么放都行——但放歪了就白放。就算放板过程中被打中，板照样放得下来。</p>
+  </div>
+</section>
+
+<!-- ============ 了解对手 ============ -->
+<section id="basics">
+  <h2>了解你的对手</h2>
+  <div class="card">
+    <h3 style="margin-top:0">所有鬼魂的基础能力</h3>
+    <p class="small"><strong>移动、翻窗、踢板</strong>（摧毁放下的板，约 5 秒以上，期间不可被打断）；<strong>普通攻击</strong>——挥空了会在原地站 2 秒，这是你的反击窗口；<strong>蓄力刀</strong>——抬手后加速冲刺约一步半出刀，不可取消，但抬手就是预告。</p>
+    <h3>杀戮欲望</h3>
+    <p class="small">追击时间越长，鬼越快——<strong>每约 15 秒提速一档</strong>（快走→慢跑→冲刺），最多三档。它使用技能、命中你、或踢板后，提速会清零重来。</p>
+    <h3>红光</h3>
+    <p class="small">猎杀阶段，鬼魂头顶会亮起红光（约 1.5 米内可见），红光就是它的位置。<span class="danger">如果红光熄灭了——它进入了"无法侦测"状态，可能正在靠近你。</span></p>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">预警动作速查</h3>
+    <table>
+      <tr><th>信号</th><th>含义</th></tr>
+      <tr><td>笑声</td><td>幻影进入偷袭 / 恶魔准备冲刺</td></tr>
+      <tr><td>叫声</td><td>幻影冲刺蓄力中 / 御灵的鬼房有人进去了</td></tr>
+      <tr><td>怒吼＋定住</td><td>赤鬼的一刀杀冲刺即将发动</td></tr>
+      <tr><td>棒的碰撞声</td><td>幽灵的屠戮猛击蓄力中</td></tr>
+      <tr><td>钟声</td><td>雾影来了（隐匿）或要现身了</td></tr>
+      <tr><td>抬手</td><td>任何鬼在蓄力</td></tr>
+      <tr><td>换手</td><td>女妖 / 恶魔 / 赤鬼要放技能了</td></tr>
+      <tr><td>白板挪动声</td><td>魅影穿墙</td></tr>
+      <tr><td>垂着棒冲刺</td><td>亡魂第一冲，<strong>打不了人，不用躲</strong></td></tr>
+      <tr><td>举着棒冲刺</td><td>亡魂后续冲刺，<span class="danger">可以出刀，快躲</span></td></tr>
+      <tr><td>红光熄灭</td><td>无法侦测状态——提高警惕</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 证据 ============ -->
+<section id="evidence">
+  <h2>证据与鉴定</h2>
+  <div class="card">
+    <p class="small">每只鬼固定拥有 <strong>3 条证据</strong>。集齐 3 条，就能锁定它的身份。</p>
+  </div>
+  <div class="ev-grid">
+    <div class="ev-item"><b><span class="dot" style="background:var(--emf)"></span>EMF</b><span>携带探测器靠近鬼魂（约 1 米内），读数跳动即成立</span></div>
+    <div class="ev-item"><b><span class="dot" style="background:var(--uv)"></span>紫外线</b><span>鬼魂掉落的便签纸，用 UV 灯照射显现图案即成立</span></div>
+    <div class="ev-item"><b><span class="dot" style="background:var(--note)"></span>鬼魂笔记</b><span>在笔记本上留下字迹或涂画即成立</span></div>
+    <div class="ev-item"><b><span class="dot" style="background:var(--board)"></span>通灵板</b><span>放置通灵板提问，获得回应即成立</span></div>
+    <div class="ev-item"><b><span class="dot" style="background:var(--frog)"></span>撕毁的青蛙</b><span>放置纸青蛙，被鬼魂撕碎即成立</span></div>
+    <div class="ev-item"><b><span class="dot" style="background:var(--balloon)"></span>气球</b><span>鬼魂身上带着气球即成立（肉眼直读）</span></div>
+    <div class="ev-item"><b><span class="dot" style="background:var(--cold)"></span>刺骨寒温</b><span>现场显示屏的室温降到 0℃ 以下即成立</span></div>
+  </div>
+  <div class="card" style="border-color:rgba(212,160,23,.4)">
+    <p class="small"><span class="warn">假阴性原则：</span>证据不在它的组合里时，测试就<strong>不会有任何反应</strong>。没有反应本身也是情报——用排除法推进。</p>
+  </div>
+</section>
+
+<!-- ============ 鬼魂档案 ============ -->
+<section id="archives">
+  <h2>24 鬼档案</h2>
+
+  <div class="filter-box">
+    <div class="fb-title">证据筛选器——点选你已经确认的证据，自动缩小嫌疑范围</div>
+    <div class="chips">
+      <span class="chip" data-ev="emf">EMF</span>
+      <span class="chip" data-ev="uv">紫外线</span>
+      <span class="chip" data-ev="note">鬼魂笔记</span>
+      <span class="chip" data-ev="board">通灵板</span>
+      <span class="chip" data-ev="frog">撕毁的青蛙</span>
+      <span class="chip" data-ev="balloon">气球</span>
+      <span class="chip" data-ev="cold">刺骨寒温</span>
+    </div>
+    <div class="fb-bar">
+      <div class="fb-count">当前符合嫌疑：<b id="count">24</b> / 24</div>
+      <button class="fb-reset" id="reset">重置筛选</button>
+    </div>
+  </div>
+
+  <p class="small muted" style="margin-bottom:12px">点开卡片查看<strong>技能详情与应对</strong>。建议：调查阶段用证据锁定嫌疑 → 鉴鬼确认 → 再细读对应档案。<br>注：拟魂必定额外携带气球；幻妖的技能档案缺失。</p>
+
+  <details class="ghost" data-ev="emf,note,board"><summary><span class="g-num">01</span><span class="g-name">魂魄<i>Spirit</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb emf">EMF</span><span class="eb note">鬼魂笔记</span><span class="eb board">通灵板</span></div>
+    <div class="g-body"><h4 class="sk">技能</h4><p>无。它只依靠杀戮欲望越追越快。</p>
+    <h4 class="ct">应对</h4><p>拉扯地形、逼它踢板或挥空，重置它的提速。</p></div></details>
+
+  <details class="ghost" data-ev="emf,frog,board"><summary><span class="g-num">02</span><span class="g-name">魅影<i>Wraith</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb emf">EMF</span><span class="eb frog">撕毁的青蛙</span><span class="eb board">通灵板</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 残影穿行</h4><p>可穿越任何地形（包括白板墙），最多连续 2 次；每次使用后必须把动过的地形复原。复原期间无法攻击，且<strong>免疫板晕（别浪费板）</strong>。充能每 5 秒恢复 1 次。</p>
+    <h4 class="ct">应对</h4><p>留意白板被挪动的声响；它出刀后必定停下复原地形——这是拉开距离的最好时机。</p></div></details>
+
+  <details class="ghost" data-ev="uv,frog,board"><summary><span class="g-num">03</span><span class="g-name">幻影<i>Phantom</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb uv">紫外线</span><span class="eb frog">撕毁的青蛙</span><span class="eb board">通灵板</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 潜袭狂笑</h4><p>发出笑声后红光熄灭，进入偷袭状态（最长 20 秒，冷却 10 秒）；冲刺前抬手蓄力 3 秒并发出叫声；冲刺持续 5 秒、全程喊叫。</p>
+    <h4 class="ct">应对</h4><p>听声辨位，用掩体让它冲空——空刀后它会原地愣 2 秒。</p></div></details>
+
+  <details class="ghost" data-ev="uv,board,note"><summary><span class="g-num">04</span><span class="g-name">骚灵<i>Poltergeist</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb uv">紫外线</span><span class="eb board">通灵板</span><span class="eb note">鬼魂笔记</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 乱掷纷飞</h4><p>扔纸团（投掷前蓄力 1 秒）；<strong>同一个人被连续砸中 3 次</strong>才算 1 次伤害；换目标计数清零。</p>
+    <h4 class="ct">应对</h4><p>听到纸团破空声就换位置；被打中也别慌，你有 3 秒奔跑窗口。</p></div></details>
+
+  <details class="ghost" data-ev="balloon,frog,uv"><summary><span class="g-num">05</span><span class="g-name">女妖<i>Banshee</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb balloon">气球</span><span class="eb frog">撕毁的青蛙</span><span class="eb uv">紫外线</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 狂暴横扫</h4><p>锁定一人追到底，不击倒不换目标；换手蓄力 5 秒后横扫 4 步，被扫中<span class="danger">直接淘汰</span>，还能快速摧毁放下的板；一次最多连扫 2 回，每回冷却 5 秒。</p>
+    <h4 class="ct">应对</h4><p>被锁定的人负责拉扯，队友找机会放板；它横扫中<strong>无法翻越</strong>——翻窗逃。</p></div></details>
+
+  <details class="ghost" data-ev="emf,uv,cold"><summary><span class="g-num">06</span><span class="g-name">巨灵<i>Jinn</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb emf">EMF</span><span class="eb uv">紫外线</span><span class="eb cold">刺骨寒温</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 追踪者</h4><p>手持长棍下劈，距离约 1.5 米；同一人第 1 击＝感染、第 2 击＝伤害、第 3 击＝淘汰（它换目标感染就恢复，且可与普通命中混算）。在开着的灯旁待满 10 秒＝踢板提速；待满 30 秒＝长棍恢复 2 米——<strong>强化永久不消失</strong>。</p>
+    <h4 class="ct">应对</h4><p>提前关掉它附近的灯，阻止它变强；长棍抬起后有 1 秒蓄力，看到就躲。</p></div></details>
+
+  <details class="ghost" data-ev="board,balloon,note"><summary><span class="g-num">07</span><span class="g-name">梦魇<i>Mare</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb board">通灵板</span><span class="eb balloon">气球</span><span class="eb note">鬼魂笔记</span></div>
+    <div class="g-body"><h4 class="sk">技能</h4><p>无。</p>
+    <h4 class="ct">应对</h4><p>专心应对它的杀戮欲望即可。</p></div></details>
+
+  <details class="ghost" data-ev="balloon,note,cold"><summary><span class="g-num">08</span><span class="g-name">亡魂<i>Revenant</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb balloon">气球</span><span class="eb note">鬼魂笔记</span><span class="eb cold">刺骨寒温</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 枯萎奔袭</h4><p>最多连续 5 段冲刺、每段 5 步，只能靠撞墙转向；<strong>第一段冲刺棒是垂着的（无法攻击），之后每一段都举棒（可以出刀）</strong>；出刀或 3 秒内没接下一段就结束；踢板后 5 秒内不能再冲。</p>
+    <h4 class="ct">应对</h4><p>看清棒的位置再决定躲不躲；垂棒冲不用理，抬棒冲立刻找掩体。</p></div></details>
+
+  <details class="ghost" data-ev="emf,cold,note"><summary><span class="g-num">09</span><span class="g-name">暗影<i>Shade</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb emf">EMF</span><span class="eb cold">刺骨寒温</span><span class="eb note">鬼魂笔记</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 暗影凝视</h4><p>调查阶段它会"站直、歪头、直直盯着"一个人，盯满 10 秒完成标记；被标记的人在猎杀中被追时红光熄灭，被命中<span class="danger">直接淘汰</span>。</p>
+    <h4 class="ct">应对</h4><p>发现它摆出这个姿势，10 秒内喊出<strong>"暗影在看我"</strong>即可看破，它会重新开始计时。</p></div></details>
+
+  <details class="ghost" data-ev="note,uv,cold"><summary><span class="g-num">10</span><span class="g-name">恶魔<i>Demon</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb note">鬼魂笔记</span><span class="eb uv">紫外线</span><span class="eb cold">刺骨寒温</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 掠夺突进</h4><p>换手蓄力 3 秒并发出笑声，然后两段冲刺、每段 10 步；撞墙不停，会贴墙滑行，中途无法取消。</p>
+    <h4 class="ct">应对</h4><p>听到笑声立刻离开墙边和直线通道；被命中后它要擦刀 7 秒——快跑。</p></div></details>
+
+  <details class="ghost" data-ev="frog,cold,balloon"><summary><span class="g-num">11</span><span class="g-name">幽灵<i>Yurei</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb frog">撕毁的青蛙</span><span class="eb cold">刺骨寒温</span><span class="eb balloon">气球</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 三阶恶变</h4><p>它不随时间提速，而是分三阶段成长：<strong>1 阶段</strong>红光熄灭、走得极慢，追人累计 30 秒→成长；<strong>2 阶段</strong>红光恢复、速度正常，再追 30 秒→成长；<strong>3 阶段</strong>解锁屠戮猛击——举棒到肩上、发出碰撞声，蓄力 2 秒后冲刺 5 步，被命中<span class="danger">直接淘汰</span>。击杀一人后退回 2 阶段，但成长时间缩短 10 秒；换目标不会清零成长计时。</p>
+    <h4 class="ct">应对</h4><p>红光就是它的阶段指示灯；3 阶段听到碰撞声立刻绕掩体；别让它安稳地追满 30 秒。</p></div></details>
+
+  <details class="ghost" data-ev="emf,cold,frog"><summary><span class="g-num">12</span><span class="g-name">赤鬼<i>Oni</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb emf">EMF</span><span class="eb cold">刺骨寒温</span><span class="eb frog">撕毁的青蛙</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 怒血狂奔</h4><p>命中任何人积 1 怒；1 怒需等 20 秒才能发动；2 怒立刻可发动，但发动前必定<strong>怒吼＋原地僵直 2 秒</strong>。技能为冲刺一刀杀：冲刺中不能转向，只有出刀瞬间能转 90°。</p>
+    <h4 class="ct">应对</h4><p>数它打中了几个人；听到怒吼就<strong>横向</strong>闪避。</p></div></details>
+
+  <details class="ghost" data-ev="board,balloon,frog"><summary><span class="g-num">13</span><span class="g-name">妖怪<i>Yokai</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb board">通灵板</span><span class="eb balloon">气球</span><span class="eb frog">撕毁的青蛙</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 闭目相位</h4><p>原地静止 3 秒蒙上布后，移动完全无限制（可冲刺、可急转）；但蒙布时它<strong>看不清远处</strong>。出刀后必须摘布并冷却 10 秒；蒙布期间不能踢板、翻窗，但<strong>可以被板砸晕</strong>。</p>
+    <h4 class="ct">应对</h4><p>它蒙布时保持安静、拉开距离；放板砸它有效。</p></div></details>
+
+  <details class="ghost" data-ev="uv,balloon,cold"><summary><span class="g-num">14</span><span class="g-name">寒魔<i>Hantu</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb uv">紫外线</span><span class="eb balloon">气球</span><span class="eb cold">刺骨寒温</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 寒冰标记</h4><p>猎杀开始后在地上放置最多 3 个寒冰标记（放置需 3 秒）；它每次踩过标记都会提速约 3 秒。标记本身不伤人。</p>
+    <h4 class="ct">应对</h4><p>看到地上的标记绕开走；也可以<strong>撕掉带走</strong>——它这一局就少一个标记。</p></div></details>
+
+  <details class="ghost" data-ev="emf,uv,frog"><summary><span class="g-num">15</span><span class="g-name">御灵<i>Goryo</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb emf">EMF</span><span class="eb uv">紫外线</span><span class="eb frog">撕毁的青蛙</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 缚魂锁</h4><p>开局自选一间"鬼房"；<strong>任何人进入鬼房，立刻成为它的猎杀目标</strong>——调查和猎杀阶段都有效，而且有人进它就马上换（哪怕差一点就打到上一个）。追击目标时它可以一直跑，命中后的停顿也只有约 3 秒。</p>
+    <h4 class="ct">应对</h4><p>进入鬼房时它会发出叫声——听到叫声就要小心；可以<strong>轮流进鬼房</strong>，把追击从队友身上引开。</p></div></details>
+
+  <details class="ghost" data-ev="emf,uv,note"><summary><span class="g-num">16</span><span class="g-name">鬼婴<i>Myling</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb emf">EMF</span><span class="eb uv">紫外线</span><span class="eb note">鬼魂笔记</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 无法侦测</h4><p>全程没有红光，而且会刻意放轻脚步。</p>
+    <h4 class="ct">应对</h4><p>只能靠眼睛和它碰道具的声响定位，时刻留意身后。</p></div></details>
+
+  <details class="ghost" data-ev="board,balloon,cold"><summary><span class="g-num">17</span><span class="g-name">怨灵<i>Onryo</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb board">通灵板</span><span class="eb balloon">气球</span><span class="eb cold">刺骨寒温</span></div>
+    <div class="g-body"><h4 class="sk">技能</h4><p>无。</p>
+    <h4 class="ct">应对</h4><p>专心应对它的杀戮欲望即可。</p></div></details>
+
+  <details class="ghost" data-ev="emf,board,cold"><summary><span class="g-num">18</span><span class="g-name">孪魂<i>Twins</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb emf">EMF</span><span class="eb board">通灵板</span><span class="eb cold">刺骨寒温</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 血之羁绊</h4><p>两只鬼同时在场，但任意时刻<strong>只有一只能动</strong>，行动的那只一定会喊叫，另一只定在原地；它们永远不会提速。</p>
+    <h4 class="ct">应对</h4><p>盯紧喊叫的那只；给定住的鬼放板只是让它挪到板另一侧，作用有限。</p></div></details>
+
+  <details class="ghost" data-ev="emf,balloon,frog"><summary><span class="g-num">19</span><span class="g-name">雷魂<i>Raiju</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb emf">EMF</span><span class="eb balloon">气球</span><span class="eb frog">撕毁的青蛙</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 充能猎影</h4><p>手持长棍戳刺，<strong>可以隔着桌子捅到你</strong>，距离约 2 米；同一人被捅 2 次即淘汰（与普通命中混算）。它站在<strong>通电的电器</strong>旁边时获得强化（解锁冲刺）。</p>
+    <h4 class="ct">应对</h4><p><strong>关掉场地里的电器</strong>就能削弱它（它已举起的棍会打完才失效）；看到它抬手有 1 秒蓄力。</p></div></details>
+
+  <details class="ghost" data-ev="emf,uv,balloon"><summary><span class="g-num">20</span><span class="g-name">幻妖<i>Obake</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb emf">EMF</span><span class="eb uv">紫外线</span><span class="eb balloon">气球</span></div>
+    <div class="g-body"><h4 class="sk">技能</h4><p>？？？<span class="redacted">档案缺失无法提供任何技能情报档案缺失</span>？？？</p>
+    <h4 class="ct">应对</h4><p>本局没有任何先例可循。相信你的直觉。</p></div></details>
+
+  <details class="ghost" data-ev="board,note,cold"><summary><span class="g-num">21</span><span class="g-name">魔洛伊<i>Moroi</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb board">通灵板</span><span class="eb note">鬼魂笔记</span><span class="eb cold">刺骨寒温</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 汲能</h4><p>命中和技能都<strong>不会</strong>重置它的提速。打中越多，它越快。</p>
+    <h4 class="ct">应对</h4><p>别让它滚起雪球，尽早拉开距离周旋。</p></div></details>
+
+  <details class="ghost" data-ev="board,note,frog"><summary><span class="g-num">22</span><span class="g-name">雾影<i>Deogen</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb board">通灵板</span><span class="eb note">鬼魂笔记</span><span class="eb frog">撕毁的青蛙</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 哀号隐匿</h4><p>敲响隐身钟（3 秒）后红光熄灭、可以奔跑、翻窗踢板都更快——<strong>但不能出刀</strong>；敲现身钟（5 秒）时严重减速。技能无使用次数限制。</p>
+    <h4 class="ct">应对</h4><p>钟声就是警报；它隐匿时<strong>被板砸中会晕 7 秒</strong>（比平时更久）——这是最佳反制时机。</p></div></details>
+
+  <details class="ghost" data-ev="balloon,note,frog"><summary><span class="g-num">23</span><span class="g-name">刹耶<i>Thaye</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb balloon">气球</span><span class="eb note">鬼魂笔记</span><span class="eb frog">撕毁的青蛙</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 狂潮渐衰</h4><p>狂潮中被它命中只算普通伤害（计入 2 次淘汰），但它每命中一个<strong>不同的人</strong>，离"直接淘汰"就更近一步：<strong>连续命中的不同人数达到本局开场人数后，下一击无论打中谁都直接淘汰</strong>。重复命中同一个人会让狂潮立即结束。每次狂潮 15 秒内没打到新目标即结束，之后充能 15 秒。</p>
+    <h4 class="ct">应对</h4><p>被追时和队友<strong>分散</strong>，别让它凑够"不同的人"；情况所迫时，重复吃它一刀反而会打断它的狂潮。</p></div></details>
+
+  <details class="ghost" data-ev="board,uv,cold,balloon"><summary><span class="g-num">24</span><span class="g-name">拟魂<i>Mimic</i></span><span class="g-arrow">▶</span></summary>
+    <div class="g-evline"><span class="eb board">通灵板</span><span class="eb uv">紫外线</span><span class="eb cold">刺骨寒温</span><span class="eb must">必带：气球</span></div>
+    <div class="g-body"><h4 class="sk">技能 · 万象拟态</h4><p>开局随机复制另一只鬼的技能，整局不变。</p>
+    <h4 class="ct">应对</h4><p>它一定带着气球——这是唯一固定线索；如果它的行为和证据指向对不上，想想它。</p></div></details>
+</section>
+
+<!-- ============ 结算 ============ -->
+<section>
+  <h2>结算</h2>
+  <div class="card">
+    <p class="small">猎杀结束（3 分钟到点或全员淘汰）后，工作人员当场公布：</p>
+    <p class="small">一、<strong>鬼魂的真实身份</strong>；二、<strong>鉴定结果</strong>（正确 / 错误）；三、<strong>存活名单</strong>。</p>
+    <p class="small" style="color:var(--orange)"><strong>完美通关：鉴定正确 ＋ 全员存活。</strong></p>
+  </div>
+</section>
+
+<!-- ============ 安全 ============ -->
+<section id="safety">
+  <h2>安全守则</h2>
+  <div class="stop"><b>停</b><span class="small">任何人喊出"停"，全场立即静止。<br>感到任何不适或危险，立刻喊。</span></div>
+  <div class="card">
+    <ul style="padding-left:18px;font-size:14px;color:var(--muted)">
+      <li style="margin-bottom:8px">全程<strong style="color:var(--text)">禁止奔跑</strong>（受击后的 3 秒窗口除外）——地面有障碍物，安全第一。</li>
+      <li style="margin-bottom:8px"><strong style="color:var(--text)">禁止与鬼魂肢体接触</strong>：不推搡、不拉扯、不抓握鬼魂或其道具。</li>
+      <li style="margin-bottom:8px">场地已铺设防滑垫、桌椅边角已软包——但请仍然注意脚下与转角。</li>
+      <li>身体不适请提前告知工作人员，可随时退出，不问原因。</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  猎鬼手册 V2 · 万圣节鬼屋 · 玩家版<br>
+  祝你好运，猎鬼人。
+</footer>
+
+</div>
+
+<div class="float-btns">
+  <button class="fbtn" id="toTop" title="回到顶部">顶</button>
+  <button class="fbtn" id="expandAll" title="展开全部">全开</button>
+</div>
+
+<script>
+(function(){
+  var chips=document.querySelectorAll('.chip');
+  var ghosts=document.querySelectorAll('.ghost');
+  var countEl=document.getElementById('count');
+  var total=ghosts.length;
+
+  function apply(){
+    var act=[];
+    chips.forEach(function(c){if(c.classList.contains('active'))act.push(c.dataset.ev)});
+    var n=0;
+    ghosts.forEach(function(g){
+      var ev=g.dataset.ev.split(',');
+      var ok=act.every(function(a){return ev.indexOf(a)>-1});
+      g.classList.toggle('dimmed',!ok);
+      if(ok)n++;
+    });
+    countEl.textContent=n;
+    var b=countEl;
+    b.style.color=n<=3?'#ff7a1a':'';
+  }
+  chips.forEach(function(c){c.addEventListener('click',function(){
+    c.classList.toggle('active');apply();
+  })});
+  document.getElementById('reset').addEventListener('click',function(){
+    chips.forEach(function(c){c.classList.remove('active')});apply();
+  });
+
+  var expanded=false;
+  document.getElementById('expandAll').addEventListener('click',function(){
+    expanded=!expanded;
+    ghosts.forEach(function(g){g.open=expanded});
+    this.textContent=expanded?'全合':'全开';
+  });
+  document.getElementById('toTop').addEventListener('click',function(){
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+})();
+</script>
+</body>
+</html>
