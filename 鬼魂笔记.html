@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#241b17">
+<title>Ghost Notebook · Ghost Note</title>
+<style>
+  :root{
+    --wood:#241b17;--wood2:#3a2921;--paper:#d9c99b;--paper2:#cdbb89;
+    --ink:#27241e;--faded:#6d624b;--rule:rgba(93,113,137,.2);--margin:rgba(155,71,66,.34);
+    --blue:#296887;--blue-bg:rgba(54,126,158,.2);--red:#9b403b;--red-bg:rgba(155,64,59,.2);
+    --gold:#785b22;--shadow:rgba(0,0,0,.55)
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html{min-width:800px;background:var(--wood)}
+  body{
+    min-height:100vh;color:var(--ink);font-family:"Kaiti SC","STKaiti","Segoe Print","Microsoft YaHei",serif;
+    background:
+      radial-gradient(ellipse at 20% 10%,rgba(255,215,160,.09),transparent 32%),
+      radial-gradient(ellipse at 90% 90%,rgba(0,0,0,.28),transparent 40%),
+      repeating-linear-gradient(8deg,rgba(255,255,255,.018) 0 2px,transparent 2px 8px),
+      linear-gradient(135deg,var(--wood),var(--wood2));
+    padding:24px;overflow-x:auto
+  }
+  button,input{font:inherit}
+  .desk{width:min(1480px,calc(100vw - 48px));min-width:760px;margin:0 auto}
+  .topbar{display:flex;justify-content:space-between;align-items:center;color:#d8c6a1;margin:0 8px 12px;letter-spacing:2px}
+  .topbar .brand{font-family:"Times New Roman",serif;font-weight:700;font-size:20px;letter-spacing:5px;color:#e0c998}
+  .topbar .internal{font-family:"Microsoft YaHei",sans-serif;font-size:12px;color:#bd9d62;border:1px solid rgba(224,201,152,.35);padding:5px 10px;border-radius:2px}
+  .notebook{
+    display:grid;grid-template-columns:minmax(340px,.82fr) minmax(500px,1.18fr);min-height:calc(100vh - 105px);
+    filter:drop-shadow(0 24px 26px var(--shadow));
+  }
+  .page{
+    position:relative;overflow:hidden;padding:34px 30px 34px 58px;
+    background-color:var(--paper);
+    background-image:
+      linear-gradient(90deg,transparent 0 44px,var(--margin) 44px 46px,transparent 46px),
+      repeating-linear-gradient(0deg,transparent 0 28px,var(--rule) 28px 29px),
+      radial-gradient(ellipse at 20% 10%,rgba(255,255,255,.22),transparent 40%),
+      radial-gradient(ellipse at 90% 80%,rgba(91,59,20,.12),transparent 45%);
+    box-shadow:inset 0 0 34px rgba(71,47,18,.2)
+  }
+  .page::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(88deg,transparent 0 6px,rgba(70,50,20,.025) 6px 8px)}
+  .left-page{border-radius:5px 0 0 5px;transform:rotate(-.12deg);z-index:1}
+  .right-page{border-radius:0 5px 5px 0;padding-left:44px;transform:rotate(.1deg)}
+  .spine{position:absolute;top:0;bottom:0;right:-7px;width:15px;z-index:5;background:linear-gradient(90deg,rgba(46,28,16,.12),rgba(61,38,22,.55),rgba(255,237,181,.35),rgba(54,32,18,.4));box-shadow:3px 0 8px rgba(0,0,0,.3)}
+  .right-page .spine{display:none}
+  h1{font-family:"Times New Roman","Kaiti SC",serif;font-size:clamp(27px,3vw,44px);letter-spacing:5px;color:#35291b;line-height:1.1;margin-bottom:5px;position:relative}
+  .subtitle{font-family:"Times New Roman",serif;font-size:12px;letter-spacing:4px;color:var(--faded);margin-bottom:25px}
+  h2{font-family:"Kaiti SC","STKaiti",serif;font-size:22px;color:#3e3020;margin:22px 0 10px;letter-spacing:3px;display:flex;align-items:center;gap:9px}
+  h2::before{content:"";width:18px;height:2px;background:var(--gold);display:inline-block;box-shadow:0 4px 0 rgba(120,91,34,.35)}
+  h3{font-size:16px;color:#4b3920;margin:15px 0 6px}
+  p{font-size:14px;line-height:1.8;margin-bottom:10px}
+  .note-box{border:1px solid rgba(92,69,28,.36);background:rgba(255,246,208,.23);padding:12px 14px;margin:12px 0 16px;box-shadow:2px 3px 0 rgba(90,57,18,.08);font-size:13px;line-height:1.8}
+  .note-box b{color:var(--red)}
+  .scribble{font-size:12px;color:var(--faded);font-style:italic;transform:rotate(-1deg);display:inline-block}
+  .evidence-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
+  .evidence{
+    position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;
+    border:1px solid rgba(73,59,34,.36);border-radius:2px;padding:7px 10px 7px 14px;background:rgba(255,247,211,.28);
+    color:#3c3020;cursor:pointer;text-align:left;transition:.15s;box-shadow:1px 2px 0 rgba(63,40,16,.08)
+  }
+  .evidence::before{content:"";position:absolute;left:4px;top:0;bottom:0;width:2px;background:transparent}
+  .evidence:hover{transform:translateX(2px);background:rgba(255,252,224,.55)}
+  .evidence .ename{font-size:15px;font-weight:700}.evidence .ekey{font-family:Arial,sans-serif;font-size:10px;letter-spacing:1px;color:var(--faded)}
+  .evidence .state{font-family:"Microsoft YaHei",sans-serif;font-size:11px;color:var(--faded);white-space:nowrap}
+  .evidence[data-state="yes"]{background:var(--blue-bg);border-color:var(--blue);color:#194a63}
+  .evidence[data-state="yes"]::before{background:var(--blue)}
+  .evidence[data-state="yes"] .state{color:var(--blue);font-weight:700}
+  .evidence[data-state="yes"] .state::before{content:"✓ "}
+  .evidence[data-state="no"]{background:var(--red-bg);border-color:var(--red);color:#72302d;text-decoration:line-through;text-decoration-thickness:1px}
+  .evidence[data-state="no"]::before{background:var(--red)}
+  .evidence[data-state="no"] .state{color:var(--red);font-weight:700}
+  .evidence[data-state="no"] .state::before{content:"× "}
+  .legend{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:13px 0;font-family:"Microsoft YaHei",sans-serif;font-size:11px;color:var(--faded)}
+  .legend span{padding:4px 5px;border:1px solid rgba(73,59,34,.25);text-align:center}.legend .l-yes{color:var(--blue);border-color:rgba(41,104,135,.45)}.legend .l-no{color:var(--red);border-color:rgba(155,64,59,.45)}
+  .summary{font-family:"Microsoft YaHei",sans-serif;font-size:12px;color:var(--faded);line-height:1.8;border-top:1px dashed rgba(73,59,34,.35);padding-top:12px;margin-top:15px}
+  .summary b{font-size:20px;color:#3a2d1c;font-family:Georgia,serif}
+  .left-actions{display:flex;gap:8px;margin-top:18px}
+  .old-btn{border:1px solid rgba(73,59,34,.42);background:rgba(255,247,211,.35);color:#4a3921;padding:7px 12px;cursor:pointer;font-family:"Microsoft YaHei",sans-serif;font-size:12px;border-radius:2px;box-shadow:1px 2px 0 rgba(63,40,16,.12)}
+  .old-btn:hover{background:rgba(255,252,224,.7);transform:translateY(-1px)}
+  .right-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:2px solid rgba(88,65,25,.35);padding-bottom:10px;margin-bottom:12px}
+  .right-head h2{margin:0}.result{font-family:"Microsoft YaHei",sans-serif;text-align:right;font-size:11px;color:var(--faded);line-height:1.7}.result b{font-family:Georgia,serif;font-size:22px;color:#3c3020}
+  .ghost-grid{display:grid;grid-template-columns:repeat(3,minmax(145px,1fr));gap:8px}
+  .ghost-card{
+    min-height:112px;border:1px solid rgba(73,59,34,.35);background:rgba(255,247,211,.26);padding:10px 10px 9px;position:relative;transition:opacity .2s,filter .2s,transform .15s;box-shadow:1px 2px 0 rgba(63,40,16,.07)
+  }
+  .ghost-card:hover{transform:translateY(-1px);background:rgba(255,252,224,.45)}
+  .ghost-card.dim{opacity:.22;filter:grayscale(.8)}
+  .g-top{display:flex;align-items:baseline;gap:7px;border-bottom:1px solid rgba(73,59,34,.22);padding-bottom:5px;margin-bottom:7px}
+  .g-num{font-family:Georgia,serif;font-size:12px;color:var(--faded)}.g-cn{font-size:16px;font-weight:700;color:#392b1d}.g-en{font-family:Arial,sans-serif;font-size:10px;color:var(--faded);margin-left:auto}
+  .g-skill{font-size:12px;color:#604c28;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .g-evidence{display:flex;flex-wrap:wrap;gap:4px}.tag{font-family:"Microsoft YaHei",sans-serif;font-size:10px;padding:2px 5px;border:1px solid rgba(73,59,34,.28);color:#68583b;background:rgba(255,249,219,.36)}
+  .tag.extra{border-style:dashed;color:#8b6236}
+  .filter-note{font-family:"Microsoft YaHei",sans-serif;font-size:11px;color:var(--faded);margin:9px 0 12px;font-style:italic}
+  .footer-note{margin-top:18px;font-family:"Microsoft YaHei",sans-serif;font-size:11px;color:var(--faded);text-align:right}
+  @media(max-width:1050px){.ghost-grid{grid-template-columns:repeat(2,minmax(145px,1fr))}}
+  @media(max-width:820px){
+    html{min-width:0}.desk{min-width:0;width:100%}body{padding:12px}.notebook{display:block;min-height:auto}.left-page,.right-page{transform:none;border-radius:4px;padding:28px 25px 28px 48px}.left-page{margin-bottom:10px}.spine{display:none}.right-page{padding-left:48px}.ghost-grid{grid-template-columns:repeat(2,minmax(130px,1fr))}
+  }
+</style>
+</head>
+<body>
+<div class="desk">
+  <div class="topbar"><div class="brand">GHOST NOTE</div><div class="internal">COMPUTER SPECIALIST TOOL · STAFF ONLY</div></div>
+  <div class="notebook">
+    <section class="page left-page">
+      <div class="spine"></div>
+      <h1>Ghost Notebook</h1>
+      <div class="subtitle">FIELD EVIDENCE NOTEBOOK · V2.1</div>
+      <div class="note-box"><b>HOW TO USE</b><br>Click an evidence button to cycle through three states: <strong>first click confirms</strong>, <strong>second click excludes</strong>, and <strong>third click clears</strong>. The list on the right updates instantly.<br><br><strong>Spirit Box:</strong> Run <code>Spirit Box.html</code>. When evidence is present, each detected speaking segment has an independent 50% chance of a reply. Confirm only after a clear reply; silence does not rule it out.</div>
+      <div class="scribble">Evidence is a trail, not a verdict.</div>
+
+      <h2>Evidence Filter</h2>
+      <div class="evidence-grid" id="evidenceGrid">
+        <button class="evidence" data-key="emf" data-state="neutral"><span><span class="ename">EMF Level 5</span><span class="ekey">EMF</span></span><span class="state">Unselected</span></button>
+        <button class="evidence" data-key="uv" data-state="neutral"><span><span class="ename">UV Light</span><span class="ekey">UV LIGHT</span></span><span class="state">Unselected</span></button>
+        <button class="evidence" data-key="note" data-state="neutral"><span><span class="ename">Ghost Notes</span><span class="ekey">NOTES</span></span><span class="state">Unselected</span></button>
+        <button class="evidence" data-key="spiritbox" data-state="neutral"><span><span class="ename">Spirit Box</span><span class="ekey">SB</span></span><span class="state">Unselected</span></button>
+        <button class="evidence" data-key="frog" data-state="neutral"><span><span class="ename">Torn Frog</span><span class="ekey">TORN FROG</span></span><span class="state">Unselected</span></button>
+        <button class="evidence" data-key="balloon" data-state="neutral"><span><span class="ename">Balloon</span><span class="ekey">BALLOON</span></span><span class="state">Unselected</span></button>
+        <button class="evidence" data-key="cold" data-state="neutral"><span><span class="ename">Freezing Cold</span><span class="ekey">FREEZING COLD</span></span><span class="state">Unselected</span></button>
+      </div>
+      <div class="legend"><span class="l-yes">Confirmed</span><span class="l-no">Excluded</span><span>Unselected</span></div>
+
+      <div class="summary">Confirmed: <b id="yesCount">0</b>　Excluded: <b id="noCount">0</b><br>Matching ghosts: <b id="matchCount">25</b> / 25</div>
+      <div class="left-actions"><button class="old-btn" id="resetBtn">Reset All</button><button class="old-btn" id="fullBtn">Fullscreen</button></div>
+      <div class="footer-note">Staff tool · Evidence combinations follow V2.1</div>
+    </section>
+
+    <section class="page right-page">
+      <div class="right-head"><div><h2>Ghost Archive</h2><div class="filter-note">Blue means confirmed, red means excluded, and dimmed cards do not match the current conditions.</div></div><div class="result">Matching Ghosts<br><b id="matchCountTop">25</b> / 25</div></div>
+      <div class="ghost-grid" id="ghostGrid">
+        <article class="ghost-card" data-ev="emf,note,spiritbox"><div class="g-top"><span class="g-num">01</span><span class="g-cn">Spirit</span></div><div class="g-skill">No Skill</div><div class="g-evidence"><span class="tag">EMF Level 5</span><span class="tag">Ghost Notes</span><span class="tag">Spirit Box</span></div></article>
+        <article class="ghost-card" data-ev="emf,frog,spiritbox"><div class="g-top"><span class="g-num">02</span><span class="g-cn">Wraith</span></div><div class="g-skill">Afterimage Passage</div><div class="g-evidence"><span class="tag">EMF Level 5</span><span class="tag">Torn Frog</span><span class="tag">Spirit Box</span></div></article>
+        <article class="ghost-card" data-ev="uv,frog,spiritbox"><div class="g-top"><span class="g-num">03</span><span class="g-cn">Phantom</span></div><div class="g-skill">Ambush Laugh</div><div class="g-evidence"><span class="tag">UV Light</span><span class="tag">Torn Frog</span><span class="tag">Spirit Box</span></div></article>
+        <article class="ghost-card" data-ev="uv,spiritbox,note"><div class="g-top"><span class="g-num">04</span><span class="g-cn">Poltergeist</span></div><div class="g-skill">Flying Mayhem</div><div class="g-evidence"><span class="tag">UV Light</span><span class="tag">Spirit Box</span><span class="tag">Ghost Notes</span></div></article>
+        <article class="ghost-card" data-ev="balloon,frog,uv"><div class="g-top"><span class="g-num">05</span><span class="g-cn">Banshee</span></div><div class="g-skill">Berserk Sweep</div><div class="g-evidence"><span class="tag">Balloon</span><span class="tag">Torn Frog</span><span class="tag">UV Light</span></div></article>
+        <article class="ghost-card" data-ev="emf,uv,cold"><div class="g-top"><span class="g-num">06</span><span class="g-cn">Jinn</span></div><div class="g-skill">Tracker</div><div class="g-evidence"><span class="tag">EMF Level 5</span><span class="tag">UV Light</span><span class="tag">Freezing Cold</span></div></article>
+        <article class="ghost-card" data-ev="spiritbox,balloon,note"><div class="g-top"><span class="g-num">07</span><span class="g-cn">Mare</span></div><div class="g-skill">No Skill</div><div class="g-evidence"><span class="tag">Spirit Box</span><span class="tag">Balloon</span><span class="tag">Ghost Notes</span></div></article>
+        <article class="ghost-card" data-ev="balloon,note,cold"><div class="g-top"><span class="g-num">08</span><span class="g-cn">Revenant</span></div><div class="g-skill">Withered Charge</div><div class="g-evidence"><span class="tag">Balloon</span><span class="tag">Ghost Notes</span><span class="tag">Freezing Cold</span></div></article>
+        <article class="ghost-card" data-ev="emf,cold,note"><div class="g-top"><span class="g-num">09</span><span class="g-cn">Shade</span></div><div class="g-skill">Shadow Gaze</div><div class="g-evidence"><span class="tag">EMF Level 5</span><span class="tag">Freezing Cold</span><span class="tag">Ghost Notes</span></div></article>
+        <article class="ghost-card" data-ev="note,uv,cold"><div class="g-top"><span class="g-num">10</span><span class="g-cn">Demon</span></div><div class="g-skill">Ravaging Rush</div><div class="g-evidence"><span class="tag">Ghost Notes</span><span class="tag">UV Light</span><span class="tag">Freezing Cold</span></div></article>
+        <article class="ghost-card" data-ev="frog,cold,balloon"><div class="g-top"><span class="g-num">11</span><span class="g-cn">Yurei</span></div><div class="g-skill">Threefold Mutation</div><div class="g-evidence"><span class="tag">Torn Frog</span><span class="tag">Freezing Cold</span><span class="tag">Balloon</span></div></article>
+        <article class="ghost-card" data-ev="emf,cold,frog"><div class="g-top"><span class="g-num">12</span><span class="g-cn">Oni</span></div><div class="g-skill">Blood Rush</div><div class="g-evidence"><span class="tag">EMF Level 5</span><span class="tag">Freezing Cold</span><span class="tag">Torn Frog</span></div></article>
+        <article class="ghost-card" data-ev="spiritbox,balloon,frog"><div class="g-top"><span class="g-num">13</span><span class="g-cn">Yokai</span></div><div class="g-skill">Eyes-Closed Phase</div><div class="g-evidence"><span class="tag">Spirit Box</span><span class="tag">Balloon</span><span class="tag">Torn Frog</span></div></article>
+        <article class="ghost-card" data-ev="uv,balloon,cold"><div class="g-top"><span class="g-num">14</span><span class="g-cn">Hantu</span></div><div class="g-skill">Frost Marks</div><div class="g-evidence"><span class="tag">UV Light</span><span class="tag">Balloon</span><span class="tag">Freezing Cold</span></div></article>
+        <article class="ghost-card" data-ev="emf,uv,frog"><div class="g-top"><span class="g-num">15</span><span class="g-cn">Goryo</span></div><div class="g-skill">Soul Bind</div><div class="g-evidence"><span class="tag">EMF Level 5</span><span class="tag">UV Light</span><span class="tag">Torn Frog</span></div></article>
+        <article class="ghost-card" data-ev="emf,uv,note"><div class="g-top"><span class="g-num">16</span><span class="g-cn">Myling</span></div><div class="g-skill">Silent Stalk</div><div class="g-evidence"><span class="tag">EMF Level 5</span><span class="tag">UV Light</span><span class="tag">Ghost Notes</span></div></article>
+        <article class="ghost-card" data-ev="spiritbox,balloon,cold"><div class="g-top"><span class="g-num">17</span><span class="g-cn">Onryo</span></div><div class="g-skill">Double-Hold Grudge</div><div class="g-evidence"><span class="tag">Spirit Box</span><span class="tag">Balloon</span><span class="tag">Freezing Cold</span></div></article>
+        <article class="ghost-card" data-ev="emf,spiritbox,cold"><div class="g-top"><span class="g-num">18</span><span class="g-cn">Twins</span></div><div class="g-skill">Blood Bond</div><div class="g-evidence"><span class="tag">EMF Level 5</span><span class="tag">Spirit Box</span><span class="tag">Freezing Cold</span></div></article>
+        <article class="ghost-card" data-ev="emf,balloon,frog"><div class="g-top"><span class="g-num">19</span><span class="g-cn">Raiju</span></div><div class="g-skill">Charged Hunter</div><div class="g-evidence"><span class="tag">EMF Level 5</span><span class="tag">Balloon</span><span class="tag">Torn Frog</span></div></article>
+        <article class="ghost-card" data-ev="emf,uv,balloon"><div class="g-top"><span class="g-num">20</span><span class="g-cn">Obake</span></div><div class="g-skill">Player Disguise</div><div class="g-evidence"><span class="tag">EMF Level 5</span><span class="tag">UV Light</span><span class="tag">Balloon</span></div></article>
+        <article class="ghost-card" data-ev="spiritbox,note,cold"><div class="g-top"><span class="g-num">21</span><span class="g-cn">Moroi</span></div><div class="g-skill">Energy Drain</div><div class="g-evidence"><span class="tag">Spirit Box</span><span class="tag">Ghost Notes</span><span class="tag">Freezing Cold</span></div></article>
+        <article class="ghost-card" data-ev="spiritbox,note,frog"><div class="g-top"><span class="g-num">22</span><span class="g-cn">Deogen</span></div><div class="g-skill">Wailing Hide</div><div class="g-evidence"><span class="tag">Spirit Box</span><span class="tag">Ghost Notes</span><span class="tag">Torn Frog</span></div></article>
+        <article class="ghost-card" data-ev="balloon,note,frog"><div class="g-top"><span class="g-num">23</span><span class="g-cn">Thaye</span></div><div class="g-skill">Fading Rampage</div><div class="g-evidence"><span class="tag">Balloon</span><span class="tag">Ghost Notes</span><span class="tag">Torn Frog</span></div></article>
+        <article class="ghost-card" data-ev="spiritbox,uv,cold"><div class="g-top"><span class="g-num">24</span><span class="g-cn">Mimic</span></div><div class="g-skill">Mimicry</div><div class="g-evidence"><span class="tag">Spirit Box</span><span class="tag">UV Light</span><span class="tag">Freezing Cold</span><span class="tag extra">Balloon · Extra</span></div></article>
+        <article class="ghost-card" data-ev="emf,uv,spiritbox"><div class="g-top"><span class="g-num">25</span><span class="g-cn">Gallu</span></div><div class="g-skill">Judgmental Wrath</div><div class="g-evidence"><span class="tag">EMF Level 5</span><span class="tag">UV Light</span><span class="tag">Spirit Box</span></div></article>
+      </div>
+      <div class="footer-note">Computer Specialist Tool · Ghost combinations follow V2.1</div>
+    </section>
+  </div>
+</div>
+<script>
+(function(){
+  var evidenceButtons=[].slice.call(document.querySelectorAll('.evidence'));
+  var cards=[].slice.call(document.querySelectorAll('.ghost-card'));
+  var yesCount=document.getElementById('yesCount');
+  var noCount=document.getElementById('noCount');
+  var matchCount=document.getElementById('matchCount');
+  var matchCountTop=document.getElementById('matchCountTop');
+  var state={};
+  evidenceButtons.forEach(function(button){state[button.dataset.key]='neutral'});
+
+  function apply(){
+    var yes=[],no=[];
+    evidenceButtons.forEach(function(button){
+      var key=button.dataset.key,status=state[key];
+      button.dataset.state=status;
+      button.querySelector('.state').textContent=status==='yes'?'Confirmed':status==='no'?'Excluded':'Unselected';
+      if(status==='yes')yes.push(key);
+      if(status==='no')no.push(key);
+    });
+    var matched=0;
+    cards.forEach(function(card){
+      var ev=(card.dataset.ev||'').split(',');
+      var ok=yes.every(function(key){return ev.indexOf(key)>-1})&&no.every(function(key){return ev.indexOf(key)===-1});
+      card.classList.toggle('dim',!ok);
+      if(ok)matched++;
+    });
+    yesCount.textContent=yes.length;noCount.textContent=no.length;matchCount.textContent=matched;matchCountTop.textContent=matched;
+  }
+
+  evidenceButtons.forEach(function(button){
+    button.addEventListener('click',function(){
+      var key=button.dataset.key;
+      state[key]=state[key]==='neutral'?'yes':state[key]==='yes'?'no':'neutral';
+      apply();
+    });
+  });
+  document.getElementById('resetBtn').addEventListener('click',function(){
+    evidenceButtons.forEach(function(button){state[button.dataset.key]='neutral'});apply();
+  });
+  document.getElementById('fullBtn').addEventListener('click',function(){
+    if(!document.fullscreenElement){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()}
+    else{document.exitFullscreen&&document.exitFullscreen()}
+  });
+  apply();
+})();
+</script>
+</body>
+</html>
