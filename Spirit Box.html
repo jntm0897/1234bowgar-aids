@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090d14">
+  <title>Spirit Box · Ghost Note</title>
+  <style>
+    :root{color-scheme:dark;--bg:#090d14;--panel:#111925;--panel2:#151f2b;--line:#273545;--text:#f1f4f8;--muted:#a4b0bf;--pink:#d58eb0;--pink2:#8d5270;--blue:#91c5dc;--green:#83cba5;--red:#e28c92;--gold:#e5bd79}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#1b2734 0%,var(--bg) 55%);color:var(--text);font:16px/1.5 Arial,Helvetica,sans-serif}
+    button,input{font:inherit}
+    .shell{max-width:980px;margin:0 auto;padding:26px 22px 36px}
+    header{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:4px 2px 18px;border-bottom:1px solid var(--line)}
+    .brand{font-size:12px;font-weight:700;letter-spacing:.28em;color:var(--gold)}
+    .tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 11px}
+    h1{margin:30px 0 6px;font-size:clamp(31px,6vw,48px);line-height:1.05;letter-spacing:.03em}
+    .subtitle{margin:0 0 24px;color:var(--muted);font-size:14px}
+    .card{background:linear-gradient(145deg,rgba(21,31,43,.96),rgba(14,20,29,.97));border:1px solid var(--line);border-radius:16px;box-shadow:0 16px 45px rgba(0,0,0,.25)}
+    .setup{padding:23px;margin:24px 0}
+    .eyebrow{color:var(--pink);font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+    h2{font-size:21px;margin:5px 0 6px}
+    .hint{color:var(--muted);font-size:13px;margin:0 0 18px}
+    fieldset{border:0;padding:0;margin:0 0 18px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .choice{display:flex;align-items:flex-start;gap:11px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#0e151e;cursor:pointer;transition:border-color .15s,background .15s}
+    .choice:has(input:checked){border-color:var(--pink2);background:#1d1720}
+    .choice input{accent-color:var(--pink);margin:4px 0 0}
+    .choice strong{display:block;font-size:14px}
+    .choice small{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+    .primary,.secondary,.danger{border:0;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer;transition:filter .15s,transform .15s}
+    .primary{background:linear-gradient(135deg,#e0a2bd,#b97194);color:#190d15}
+    .secondary{background:#202d3c;color:var(--text);border:1px solid #35485c}
+    .danger{background:#38252c;color:#f2c5c7;border:1px solid #71454e}
+    button:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}
+    button:disabled{opacity:.45;cursor:not-allowed}
+    .terminal{overflow:hidden;margin-top:24px}
+    .terminal-head{padding:18px 21px;display:flex;align-items:center;justify-content:space-between;gap:14px;border-bottom:1px solid var(--line)}
+    .terminal-head h2{margin:0;font-size:18px}
+    .status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
+    .dot{width:8px;height:8px;border-radius:50%;background:#768394;box-shadow:0 0 0 3px rgba(118,131,148,.12)}
+    .status[data-state="listening"] .dot{background:var(--green);box-shadow:0 0 0 4px rgba(131,203,165,.13)}
+    .status[data-state="calibrating"] .dot{background:var(--gold);box-shadow:0 0 0 4px rgba(229,189,121,.13)}
+    .status[data-state="speech"] .dot{background:var(--pink);box-shadow:0 0 0 5px rgba(213,142,176,.18)}
+    .status[data-state="error"] .dot{background:var(--red);box-shadow:0 0 0 4px rgba(226,140,146,.13)}
+    .terminal-body{padding:21px}
+    .mic-panel{display:grid;grid-template-columns:1fr auto;align-items:center;gap:20px;padding:16px;background:#0d141d;border:1px solid var(--line);border-radius:12px}
+    .mic-title{font-weight:700;font-size:14px}
+    .mic-copy{color:var(--muted);font-size:12px;margin-top:3px}
+    .meter{height:6px;background:#202a36;border-radius:9px;margin-top:12px;overflow:hidden}
+    .meter span{display:block;width:0;height:100%;background:linear-gradient(90deg,var(--blue),var(--pink));border-radius:9px;transition:width .08s linear}
+    .actions{display:flex;gap:9px;flex-wrap:wrap}
+    .conversation{height:330px;overflow-y:auto;margin:16px 0;padding:8px 1px;display:flex;flex-direction:column;gap:11px;scroll-behavior:smooth}
+    .welcome{margin:auto;max-width:430px;text-align:center;color:var(--muted);font-size:14px;padding:24px}
+    .welcome .wave{font-size:34px;color:var(--pink);margin-bottom:8px}
+    .message{max-width:min(78%,600px);padding:11px 14px;border-radius:13px;animation:rise .22s ease-out}
+    .message.user{align-self:flex-end;background:#1d2d3a;border:1px solid #334c5d;color:#d7e6ee}
+    .message.ghost{align-self:flex-start;background:#241923;border:1px solid #614052;color:#f2d4e2}
+    .message.silence{align-self:center;background:#111720;border:1px solid #252f3c;color:#8e9baa;font-size:13px;padding:7px 12px}
+    .message .label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.12em;opacity:.7;margin-bottom:3px}
+    .message .body{font-size:15px}
+    .time{font-size:10px;opacity:.55;margin-top:4px;text-align:right}
+    .readout{display:flex;align-items:center;gap:8px;padding:11px 13px;background:#0d141d;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .readout strong{color:var(--text);font-weight:600}
+    .fineprint{margin:14px 2px 0;color:#7e8a98;font-size:11px}
+    .footer{color:#718090;font-size:11px;text-align:center;margin-top:22px}
+    .setup-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+    .staff-toggle{font-size:11px;color:#9aa7b5;background:transparent;border:1px solid transparent;border-radius:8px;padding:6px 9px;cursor:pointer}
+    .staff-toggle:hover{border-color:var(--line);color:var(--text)}
+    @keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+    @media(max-width:640px){.shell{padding:18px 14px 28px}header{align-items:flex-start}.tag{font-size:9px}.setup{padding:18px}fieldset{grid-template-columns:1fr}.terminal-head{align-items:flex-start;flex-direction:column}.terminal-body{padding:14px}.mic-panel{grid-template-columns:1fr}.actions button{flex:1}.conversation{height:300px}.message{max-width:90%}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">GHOST NOTE</div>
+      <div class="tag">Local computer tool · microphone required</div>
+    </header>
+    <h1>Spirit Box</h1>
+    <p class="subtitle">Speak to the ghost through the computer. A clear reply confirms Spirit Box evidence.</p>
+
+    <section class="card setup" id="setupPanel" aria-labelledby="setupTitle">
+      <div class="eyebrow">Staff setup</div>
+      <h2 id="setupTitle">Choose this round’s evidence</h2>
+      <p class="hint">Choose yes or no before starting. The setting is hidden from the player screen after the round starts.</p>
+      <fieldset>
+        <label class="choice"><input type="radio" name="spiritboxEvidence" value="no"><span><strong>No Spirit Box evidence</strong><small>The ghost stays silent for this evidence test.</small></span></label>
+        <label class="choice"><input type="radio" name="spiritboxEvidence" value="yes"><span><strong>Spirit Box evidence is present</strong><small>Each detected speaking segment has an independent 50% chance of a reply.</small></span></label>
+      </fieldset>
+      <div class="setup-actions">
+        <button class="primary" id="startRound" disabled>Start Spirit Box</button>
+        <span class="hint" style="margin:0">Staff setup can be reopened with F2.</span>
+      </div>
+    </section>
+
+    <section class="card terminal" id="terminal" hidden aria-label="Spirit Box conversation">
+      <div class="terminal-head">
+        <h2>Spirit Box channel</h2>
+        <div class="status" id="status" data-state="ready"><span class="dot"></span><span id="statusText">Ready</span></div>
+      </div>
+      <div class="terminal-body">
+        <div class="mic-panel">
+          <div>
+            <div class="mic-title">Computer microphone</div>
+            <div class="mic-copy" id="micCopy">The microphone starts when staff starts the round. Speak a short question, then pause briefly.</div>
+            <div class="meter" aria-label="Microphone level"><span id="meterFill"></span></div>
+          </div>
+          <div class="actions">
+            <button class="primary" id="micButton">Start listening</button>
+            <button class="secondary" id="stopButton" disabled>Stop</button>
+          </div>
+        </div>
+        <div class="conversation" id="conversation" role="log" aria-live="polite">
+          <div class="welcome" id="welcome"><div class="wave">◌</div>Ask the ghost a question. The Spirit Box will listen for your voice.</div>
+        </div>
+        <div class="readout"><span class="dot"></span><span><strong>One speaking turn = one attempt.</strong> No reply does not rule out Spirit Box evidence.</span></div>
+        <p class="fineprint">Ghost replies appear as text. Voice activity is processed locally in this page; audio is not recorded, stored, or sent to a server. The staff evidence setting is hidden during the round.</p>
+      </div>
+    </section>
+
+    <footer class="footer">If microphone access is blocked, open this file in Chrome or Edge and allow microphone access.</footer>
+  </div>
+
+  <script>
+    (function(){
+      'use strict';
+      const setupPanel=document.getElementById('setupPanel');
+      const terminal=document.getElementById('terminal');
+      const startRoundButton=document.getElementById('startRound');
+      const micButton=document.getElementById('micButton');
+      const stopButton=document.getElementById('stopButton');
+      const status=document.getElementById('status');
+      const statusText=document.getElementById('statusText');
+      const micCopy=document.getElementById('micCopy');
+      const meterFill=document.getElementById('meterFill');
+      const conversation=document.getElementById('conversation');
+      const welcome=document.getElementById('welcome');
+
+      const ghostReplies=[
+        'I can hear you.',
+        'I am here.',
+        'Leave this place.',
+        'Behind you.',
+        'Do not come closer.',
+        'Help me.',
+        'You should not be here.',
+        'I know you are there.'
+      ];
+      const MIN_VOICE_MS=180;
+      const SILENCE_END_MS=750;
+      const CALIBRATION_MS=1400;
+      let roundHasEvidence=false;
+      let roundStarted=false;
+      let micStream=null;
+      let audioContext=null;
+      let analyser=null;
+      let meterFrame=0;
+      let phase='stopped';
+      let calibrationStarted=0;
+      let calibrationTotal=0;
+      let calibrationCount=0;
+      let voiceThreshold=0.025;
+      let voiceStartedAt=0;
+      let lastVoiceAt=0;
+      let responseIndex=-1;
+      let messageCount=0;
+      let timeData=null;
+
+      function setStatus(label,state){statusText.textContent=label;status.dataset.state=state;}
+      function showSetup(){setupPanel.hidden=false;terminal.hidden=true;}
+      function showTerminal(){setupPanel.hidden=true;terminal.hidden=false;}
+      function selectedEvidence(){const choice=document.querySelector('input[name="spiritboxEvidence"]:checked');return choice?choice.value==='yes':null;}
+      function clearEvidenceSelection(){document.querySelectorAll('input[name="spiritboxEvidence"]').forEach(input=>input.checked=false);startRoundButton.disabled=true;}
+
+      function addMessage(kind,label,body){
+        if(welcome&&welcome.isConnected)welcome.remove();
+        const item=document.createElement('div');
+        item.className='message '+kind;
+        const title=document.createElement('span'); title.className='label'; title.textContent=label;
+        const text=document.createElement('div'); text.className='body'; text.textContent=body;
+        const clock=document.createElement('div'); clock.className='time'; clock.textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        item.append(title,text,clock); conversation.appendChild(item); messageCount++;
+        while(messageCount>18){const old=conversation.querySelector('.message'); if(!old)break; old.remove(); messageCount--;}
+        conversation.scrollTop=conversation.scrollHeight;
+      }
+
+      function fairHalfChance(){
+        if(window.crypto&&window.crypto.getRandomValues){
+          const draw=new Uint32Array(1); window.crypto.getRandomValues(draw); return draw[0]<0x80000000;
+        }
+        return Math.random()<0.5;
+      }
+
+      function replyForVoiceSegment(){
+        addMessage('user','You','Voice detected.');
+        if(roundHasEvidence&&fairHalfChance()){
+          let next=Math.floor(Math.random()*ghostReplies.length);
+          if(ghostReplies.length>1&&next===responseIndex)next=(next+1)%ghostReplies.length;
+          responseIndex=next;
+          addMessage('ghost','Ghost',ghostReplies[next]);
+        }else{
+          addMessage('silence','No reply','…');
+        }
+      }
+
+      function stopListening(updateStatus){
+        if(meterFrame)cancelAnimationFrame(meterFrame);
+        meterFrame=0;
+        if(micStream){micStream.getTracks().forEach(track=>track.stop());micStream=null;}
+        if(audioContext){audioContext.close().catch(()=>{});audioContext=null;}
+        analyser=null;timeData=null;phase='stopped';voiceStartedAt=0;lastVoiceAt=0;
+        meterFill.style.width='0%';micButton.disabled=false;stopButton.disabled=true;
+        micButton.textContent='Start listening';
+        if(updateStatus&&roundStarted)setStatus('Ready','ready');
+      }
+
+      function rmsLevel(){
+        if(!analyser||!timeData)return 0;
+        analyser.getByteTimeDomainData(timeData);
+        let sum=0;
+        for(let i=0;i<timeData.length;i++){const n=(timeData[i]-128)/128;sum+=n*n;}
+        return Math.sqrt(sum/timeData.length);
+      }
+
+      function meterLoop(now){
+        if(!analyser||phase==='stopped')return;
+        const level=rmsLevel();
+        meterFill.style.width=Math.min(100,Math.round(level*850))+'%';
+        if(phase==='calibrating'){
+          calibrationTotal+=level;calibrationCount++;
+          if(now-calibrationStarted>=CALIBRATION_MS){
+            const ambient=calibrationCount?calibrationTotal/calibrationCount:0;
+            voiceThreshold=Math.max(0.018,Math.min(0.075,ambient*3.2+0.009));
+            phase='listening';setStatus('Listening','listening');
+            micCopy.textContent='Speak a short question, then pause briefly. Each detected speaking segment is one attempt.';
+          }else{
+            setStatus('Calibrating','calibrating');
+            micCopy.textContent='Calibrating room noise. Please stay quiet for a moment.';
+          }
+        }else if(phase==='listening'){
+          if(level>=voiceThreshold){
+            if(!voiceStartedAt)voiceStartedAt=now;
+            lastVoiceAt=now;
+            if(now-voiceStartedAt>=80)setStatus('Voice detected','speech');
+          }else if(voiceStartedAt&&now-lastVoiceAt>=SILENCE_END_MS){
+            const duration=lastVoiceAt-voiceStartedAt;
+            voiceStartedAt=0;lastVoiceAt=0;
+            if(duration>=MIN_VOICE_MS){replyForVoiceSegment();setStatus('Listening','listening');}
+          }else if(!voiceStartedAt){setStatus('Listening','listening');}
+        }
+        meterFrame=requestAnimationFrame(meterLoop);
+      }
+
+      async function startListening(){
+        if(!window.isSecureContext){setStatus('Secure context required','error');micCopy.textContent='Open this page from a local file, localhost, or an HTTPS address to use the microphone.';return;}
+        if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){setStatus('Microphone unavailable','error');micCopy.textContent='This browser does not provide microphone access. Use a current version of Chrome or Edge.';return;}
+        try{
+          micButton.disabled=true;setStatus('Requesting microphone','calibrating');
+          micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+          const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+          if(!AudioContextClass)throw new Error('Web Audio is not available in this browser.');
+          audioContext=new AudioContextClass();await audioContext.resume();
+          const source=audioContext.createMediaStreamSource(micStream);
+          const highPass=audioContext.createBiquadFilter();highPass.type='highpass';highPass.frequency.value=150;
+          const lowPass=audioContext.createBiquadFilter();lowPass.type='lowpass';lowPass.frequency.value=3600;
+          analyser=audioContext.createAnalyser();analyser.fftSize=1024;analyser.smoothingTimeConstant=0;
+          source.connect(highPass);highPass.connect(lowPass);lowPass.connect(analyser);
+          timeData=new Uint8Array(analyser.fftSize);phase='calibrating';calibrationStarted=performance.now();calibrationTotal=0;calibrationCount=0;
+          micButton.textContent='Listening…';stopButton.disabled=false;
+          meterFrame=requestAnimationFrame(meterLoop);
+        }catch(error){
+          stopListening(false);setStatus('Microphone unavailable','error');
+          micCopy.textContent=error&&error.name==='NotAllowedError'?'Microphone permission was denied. Allow access in the browser, then try again.':(error.message||'Could not start the microphone. Check the browser permission and try again.');
+        }
+      }
+
+      function clearConversation(){
+        conversation.replaceChildren();conversation.appendChild(welcome);messageCount=0;
+      }
+
+      function beginRound(){
+        const chosen=selectedEvidence();if(chosen===null)return;
+        stopListening(false);roundHasEvidence=chosen;roundStarted=true;
+        clearConversation();showTerminal();setStatus('Ready','ready');
+        micCopy.textContent='The microphone starts with the round. Speak a short question, then pause briefly after each speaking turn.';
+        micButton.disabled=false;stopButton.disabled=true;
+        startListening();
+      }
+
+      document.querySelectorAll('input[name="spiritboxEvidence"]').forEach(input=>input.addEventListener('change',()=>{startRoundButton.disabled=selectedEvidence()===null;}));
+      startRoundButton.addEventListener('click',beginRound);
+      micButton.addEventListener('click',startListening);
+      stopButton.addEventListener('click',()=>stopListening(true));
+      document.addEventListener('keydown',event=>{
+        if(event.key==='F2'){event.preventDefault();if(roundStarted){stopListening(false);clearEvidenceSelection();showSetup();}else showSetup();}
+        if(event.key==='Escape'&&roundStarted&& !setupPanel.hidden){beginRound();}
+      });
+      window.addEventListener('beforeunload',()=>stopListening(false));
+    })();
+  </script>
+</body>
+</html>
